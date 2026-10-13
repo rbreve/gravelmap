@@ -1,0 +1,8 @@
+# Downloaded OSM data and build intermediates (scripts/build_tiles.sh)
+data/
+
+# Generated road tiles (~360 MB, over GitHub's file size limit)
+prototype/tiles/
+
+.DS_Store
+node_modules/

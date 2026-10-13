@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#1f2a1f">
+  <title>Gravel Finland</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="map"></div>
+
+  <div id="status" class="hidden"></div>
+
+  <div id="route-card" class="hidden">
+    <div class="route-head">
+      <strong id="route-stats"></strong>
+      <button id="route-clear" aria-label="Clear route">✕</button>
+    </div>
+    <div id="route-bar"></div>
+    <div id="route-legend"></div>
+    <select id="route-profile" aria-label="Route mode"></select>
+  </div>
+
+  <button id="panel-toggle" aria-label="Layers">☰</button>
+
+  <div id="panel" class="hidden">
+    <h2>Base map</h2>
+    <select id="basemap">
+      <option value="mml-maasto">MML topo map (maastokartta)</option>
+      <option value="mml-tausta">MML light map (taustakartta)</option>
+      <option value="mml-orto">MML aerial (ortokuva)</option>
+      <option value="opentopo">OpenTopoMap (no key needed)</option>
+    </select>
+
+    <label class="key">
+      Fade base map
+      <input id="fade" type="range" min="0" max="0.7" step="0.05">
+    </label>
+
+    <label class="key">
+      MML API key
+      <input id="mml-key" type="text" placeholder="paste key from omatili.maanmittauslaitos.fi" autocomplete="off" spellcheck="false">
+    </label>
+
+    <h2>Surface overlay <small>(OpenStreetMap)</small></h2>
+    <div id="legend"></div>
+    <p class="hint">Tap a line for details.</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pmtiles@4.5.0/dist/pmtiles.js"></script>
+  <script src="app.js"></script>
+  <script src="routing.js"></script>
+</body>
+</html>
