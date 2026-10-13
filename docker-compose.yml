@@ -1,0 +1,15 @@
+# Serves the static app on the shared web_network so Nginx Proxy Manager can reach it
+# as http://gravelmap:80. Tiles (prototype/tiles/roads.pmtiles) are built separately.
+services:
+  gravelmap:
+    image: nginx:alpine
+    container_name: gravelmap
+    restart: unless-stopped
+    volumes:
+      - ./prototype:/usr/share/nginx/html:ro
+    networks:
+      - web_network
+
+networks:
+  web_network:
+    external: true

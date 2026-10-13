@@ -20,7 +20,19 @@
     </div>
     <div id="route-bar"></div>
     <div id="route-legend"></div>
-    <select id="route-profile" aria-label="Route mode"></select>
+    <div class="route-row">
+      <select id="route-profile" aria-label="Route mode"></select>
+      <button id="route-go">GO</button>
+    </div>
+  </div>
+
+  <div id="nav-bar" class="hidden">
+    <div class="nav-info">
+      <strong id="nav-remaining"></strong>
+      <span id="nav-eta"></span>
+    </div>
+    <button id="nav-recenter" class="hidden">Re-center</button>
+    <button id="nav-exit">Exit</button>
   </div>
 
   <button id="panel-toggle" aria-label="Layers">☰</button>
@@ -52,6 +64,8 @@
   <script src="https://cdn.jsdelivr.net/npm/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/pmtiles@4.5.0/dist/pmtiles.js"></script>
   <script src="app.js"></script>
+  <script src="location.js"></script>
   <script src="routing.js"></script>
+  <script src="nav.js"></script>
 </body>
 </html>

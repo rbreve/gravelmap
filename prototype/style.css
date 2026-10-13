@@ -176,9 +176,84 @@ html, body {
   border-radius: 2px;
   margin-right: 4px;
 }
-#route-profile {
+.route-row {
+  display: flex;
+  gap: 8px;
   margin-top: 8px;
-  width: 100%;
+}
+#route-profile {
+  flex: 1;
+  min-width: 0;
   font-size: 14px;
   padding: 4px;
 }
+#route-go {
+  border: none;
+  border-radius: 6px;
+  padding: 6px 22px;
+  font-size: 16px;
+  font-weight: 700;
+  background: #16a34a;
+  color: #fff;
+}
+
+#nav-bar {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  bottom: 34px;
+  max-width: 420px;
+  margin: 0 auto;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+.nav-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.nav-info strong { font-size: 20px; }
+.nav-info span { font-size: 13px; color: #555; }
+#nav-bar button {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 14px;
+  background: #e5e7eb;
+  color: #111;
+}
+#nav-bar #nav-exit { background: #dc2626; color: #fff; }
+
+/* Rider position: arrow pointing the way you're heading, plain dot until a heading is known. */
+.user-loc {
+  width: 36px;
+  height: 36px;
+}
+.user-loc svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+}
+.user-loc path {
+  fill: #2563eb;
+  stroke: #fff;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.user-loc .dot {
+  display: none;
+  position: absolute;
+  inset: 9px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 3px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+.user-loc.no-heading svg { display: none; }
+.user-loc.no-heading .dot { display: block; }

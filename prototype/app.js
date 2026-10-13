@@ -60,18 +60,14 @@ const map = new maplibregl.Map({
   style: { version: 8, sources: {}, layers: [] },
   center: settings.view.center,
   zoom: settings.view.zoom,
-  maxPitch: 0,
+  maxPitch: 60, // tilted only in navigation mode (nav.js); pitch gestures stay off
   dragRotate: false,
   attributionControl: { compact: true },
 });
 map.touchZoomRotate.disableRotation();
+map.touchPitch.disable();
 
 map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right');
-const geolocate = new maplibregl.GeolocateControl({
-  positionOptions: { enableHighAccuracy: true },
-  trackUserLocation: true,
-});
-map.addControl(geolocate, 'top-right');
 map.addControl(new maplibregl.ScaleControl(), 'bottom-left');
 
 const statusEl = document.getElementById('status');
@@ -170,8 +166,13 @@ function addRoadLayers() {
   }
 }
 
+// Only touches the status line when the hint appears or goes, so it doesn't wipe other messages.
+let zoomHintShown = false;
 function updateZoomHint() {
-  setStatus(map.getZoom() < MIN_ROAD_ZOOM ? 'Zoom in to see gravel roads' : '');
+  const show = map.getZoom() < MIN_ROAD_ZOOM;
+  if (show === zoomHintShown) return;
+  zoomHintShown = show;
+  setStatus(show ? 'Zoom in to see gravel roads' : '');
 }
 
 // --- popup ------------------------------------------------------------------------
@@ -249,8 +250,13 @@ map.on('load', () => {
   updateZoomHint();
 });
 
+// While following the rider the camera moves every frame, so saving the view is debounced.
+let saveViewTimer;
 map.on('moveend', () => {
-  const c = map.getCenter();
-  save('view', { center: [c.lng, c.lat], zoom: map.getZoom() });
+  clearTimeout(saveViewTimer);
+  saveViewTimer = setTimeout(() => {
+    const c = map.getCenter();
+    save('view', { center: [c.lng, c.lat], zoom: map.getZoom() });
+  }, 1000);
   updateZoomHint();
 });

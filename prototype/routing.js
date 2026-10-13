@@ -13,16 +13,14 @@ const ROUTE_MODES = {
 const routing = {
   start: null,  // maplibregl.Marker, set via "Start here"; otherwise the GPS position is used
   end: null,
-  gps: null,    // last [lng, lat] reported by the locate button
+  feature: null, // current route (GeoJSON feature from BRouter)
   mode: load('routeMode', 'max'),
   inflight: null,
 };
 
-geolocate.on('geolocate', e => {
-  const firstFix = !routing.gps;
-  routing.gps = [e.coords.longitude, e.coords.latitude];
-  // A destination picked before location was on: route from here as soon as we know where "here" is.
-  if (firstFix && routing.end && !routing.start) updateRoute(true);
+// A destination picked before location was on: route from here as soon as we know where "here" is.
+onLocation((pos, first) => {
+  if (first && routing.end && !routing.start) updateRoute(!navigation.active);
 });
 
 // Same rules as scripts/classify.py, applied to BRouter's per-segment way tags.
@@ -102,7 +100,7 @@ function setPoint(kind, lngLat) {
 
 function startPoint() {
   if (routing.start) return routing.start.getLngLat();
-  return routing.gps ? maplibregl.LngLat.convert(routing.gps) : null;
+  return userLoc.pos ? maplibregl.LngLat.convert(userLoc.pos) : null;
 }
 
 async function updateRoute(fit) {
@@ -115,17 +113,18 @@ async function updateRoute(fit) {
   }
 
   if (routing.inflight) routing.inflight.abort();
-  routing.inflight = new AbortController();
+  const inflight = routing.inflight = new AbortController();
   setStatus('Finding gravel route…');
 
   const lonlats = `${from.lng.toFixed(6)},${from.lat.toFixed(6)}|${to.lng.toFixed(6)},${to.lat.toFixed(6)}`;
   const params = Object.entries(ROUTE_MODES[routing.mode].params).map(([k, v]) => `&profile:${k}=${v}`).join('');
   const url = `${BROUTER_URL}?lonlats=${lonlats}&profile=gravel&alternativeidx=0&format=geojson${params}`;
   try {
-    const res = await fetch(url, { signal: routing.inflight.signal });
+    const res = await fetch(url, { signal: inflight.signal });
     if (!res.ok) throw new Error((await res.text()).trim() || `HTTP ${res.status}`);
     const data = await res.json();
     map.getSource('route').setData(data);
+    routing.feature = data.features[0];
     showSummary(data.features[0].properties);
     setStatus('');
     if (fit) {
@@ -137,6 +136,8 @@ async function updateRoute(fit) {
     if (err.name === 'AbortError') return;
     console.error(err);
     setStatus('No route found: ' + err.message);
+  } finally {
+    if (routing.inflight === inflight) routing.inflight = null;
   }
 }
 
@@ -175,7 +176,7 @@ function showSummary(props) {
     item.innerHTML = `<i style="background:${c.color}"></i>${c.label.split(':')[0]} ${pct}%`;
     legend.appendChild(item);
   }
-  document.getElementById('route-card').classList.remove('hidden');
+  if (!navigation.active) document.getElementById('route-card').classList.remove('hidden');
 }
 
 function clearRoute() {
@@ -184,6 +185,7 @@ function clearRoute() {
     if (routing[kind]) routing[kind].remove();
     routing[kind] = null;
   }
+  routing.feature = null;
   map.getSource('route').setData({ type: 'FeatureCollection', features: [] });
   document.getElementById('route-card').classList.add('hidden');
   setStatus('');
